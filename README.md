@@ -1,6 +1,4 @@
 
-# ForgeSpec
-
 <img src="assets/cover_art.png" width="320">
 
 **ForgeSpec** is a specification‑driven architecture framework for building reliable software systems with AI coding agents.
@@ -36,10 +34,6 @@ The book explains:
 • how to safely guide AI coding agents during large implementations  
 
 This repository contains the **working prompts, templates, and example workflows** referenced in the book.
-
-Official resources:
-
-Website: https://forgespec.io  
 
 ---
 
