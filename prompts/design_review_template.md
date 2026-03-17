@@ -89,14 +89,24 @@ Evaluate:
 
 ---
 
-# Pipeline Graph Analysis (if applicable)
+# Execution Graph Analysis (if applicable)
 
-Verify:
+Verify (for the chosen execution model):
 
 • correct stage ordering  
 • no cyclic dependencies  
 • valid queue topology  
 • backpressure propagation  
+
+---
+
+# Policy Parameters and Lifecycle (must be explicit)
+
+Confirm:
+
+• any “bounded/limited/throttled/retry/backoff/retention” statement includes a parameter or rule, overflow behavior, and an owner  
+• the primary work unit has a lifecycle/state model (states + transitions + ownership)  
+• each invariant has an enforcement point and at least one test/validation strategy
 
 ---
 

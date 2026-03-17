@@ -51,6 +51,13 @@ Your job is to reconstruct:
 7. shutdown and lifecycle behavior
 8. invariants that must hold for the system to function correctly
 
+You must also explicitly surface common hidden-architecture hazards:
+
+• duplicated retries across layers (no single retry owner)
+• missing idempotency keys (duplicate side effects)
+• unclear ownership boundaries (two components both “own” state or retries)
+• hidden state stores or caches not reflected in documentation
+
 You must identify both:
 
 • **explicit architecture**
@@ -155,6 +162,11 @@ Derive the implicit invariants required for correct behavior, such as:
 • required resource limits
 • deterministic processing assumptions
 
+Also classify invariants as:
+
+- implicit invariants inferred from code/structure
+- explicit invariants already documented
+
 ---
 
 # OUTPUT
@@ -208,6 +220,13 @@ If architectural flaws are discovered, document them under:
 
 docs/DECISIONS.md
 
+If you see “fence in the woods” behaviors (code paths whose purpose is unclear), record them explicitly as:
+
+- DO NOT CHANGE UNTIL UNDERSTOOD
+- what it appears to do
+- why it is risky
+- what evidence would clarify its intent
+
 or
 
 docs/design_reviews/
@@ -225,7 +244,17 @@ Provide:
 5. Concurrency model
 6. Inferred invariants
 7. Potential risks
-8. Complete specification repository contents
+8. **Findings and refactor considerations** — a section or document that lists: architectural risks, performance or reliability concerns, suggested refactor directions, and any "fence in the woods"–style notes (behaviors whose purpose is unclear and should be understood before changing). This section is intended to feed into human refactor planning.
+9. Complete specification repository contents
+
+# REFACTOR CONSIDERATIONS (structure for output item 8)
+
+Structure the findings and refactor considerations to include, where applicable:
+
+- Architectural risks (e.g. unbounded resources, unclear ownership)
+- Performance or reliability concerns (e.g. bottlenecks, single points of failure)
+- Unclear or undocumented behaviors (understand before changing)
+- Recommended follow-up analysis or discovery
 
 Each file must be emitted as:
 

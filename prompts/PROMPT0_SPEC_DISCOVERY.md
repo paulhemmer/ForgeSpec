@@ -36,6 +36,8 @@ Process:
    - subsystem descriptions  
    - extracted invariants  
 
+When you encounter vague answers like “bounded” or “limited,” follow up until the bound is numeric or rule-defined, with explicit ownership and overflow behavior.
+
 Use the **Specification Discovery Question Bank** in `prompts/specification_discovery_question_bank.md` as a reference for deeper follow-up questions.
 
 ---
@@ -59,6 +61,17 @@ When the architecture stabilizes, produce:
    - responsibility ownership decisions  
    - key failure scenarios and expected behavior  
    - implementation context (stated preferences or brief recommended options, if requested)  
+
+3. A required **Decision Capture** block (domain-agnostic) containing:
+   - primary work unit(s) and identity keys
+   - execution model selection (pipeline DAG / event-driven / request-response / state machine / actor-message / service graph / other)
+   - state/lifecycle model for the primary work unit(s) (states + transitions + who mutates state)
+   - durability boundary (what is durable, when acknowledgement is allowed)
+   - retry ownership (single owner) and retry bounding rule (even if provisional)
+   - queue/buffer bounds (capacities + overflow behavior) or an explicit statement of why none exist
+   - ordering assumptions (none / partial / required) and where enforced
+   - retention/replay interaction (if applicable): retention key + replay safety rule
+   - open architectural questions (if any remain)
 
 Do not generate implementation code or a full spec repository here. The goal is to prepare inputs for the generate_spec prompt.
 

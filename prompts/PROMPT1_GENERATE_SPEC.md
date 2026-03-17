@@ -49,6 +49,24 @@ with the specification using that design.
 
 ---
 
+# DOMAIN-AGNOSTIC NOTE
+
+This prompt applies to many system types (pipelines, request/response services, state machines, actor/message systems, distributed service graphs, schedulers, data platforms, permissions systems, etc.).
+
+Use **domain-neutral terms**:
+- work unit (request/message/job/event/task)
+- boundaries (queues/channels/APIs/state stores)
+- execution model (pipeline DAG, event-driven, state machine, service graph, etc.)
+- state transitions / lifecycle
+
+If the system is *not* naturally a pipeline, still fill the required repository structure; interpret:
+- `spec/pipeline_work_units.md` as “work units for the chosen execution model”
+- `spec/pipeline_thread_model.md` as “concurrency + lifecycle model for the chosen execution model”
+
+Do not force a pipeline framing when it does not fit.
+
+---
+
 # PROCESS
 
 You must perform the following phases:
@@ -154,6 +172,12 @@ All files under docs/ are explanatory unless explicitly stated otherwise.
 
 ---
 
+# SPEC IDENTIFIERS
+
+Assign stable identifiers (e.g. SPEC-001, SPEC-002, or section IDs) to major spec sections or requirements in the generated documents where appropriate, so that design reviews, tests, and implementation can refer to them. Include these identifiers in section headings or requirement lists in spec/spec.md and other key spec docs (e.g. engineering_rules.md, pipeline_work_units.md).
+
+---
+
 # SYSTEM EXECUTION MODEL
 
 You must derive the appropriate execution architecture.
@@ -195,6 +219,33 @@ Your architecture must explicitly define:
 • error propagation  
 • determinism guarantees  
 • memory bounding strategy  
+
+---
+
+# REQUIRED POLICY PARAMETERS (NO “BOUNDED” WITHOUT A RULE)
+
+Any time you state “bounded/limited/throttled/retry/backoff/retention,” you MUST also provide:
+
+- an explicit parameter (number/limit) OR a precise rule that determines the bound
+- overflow behavior (what happens when the bound is hit)
+- ownership (which subsystem enforces it)
+
+At minimum, `spec/spec.md` must include authoritative parameters/rules for:
+
+1. **Retry policy**
+   - max attempts
+   - retryable vs non-retryable classification rule
+   - DLQ routing rule after exhaustion
+2. **Queue/buffer bounds**
+   - capacity target and overflow behavior
+3. **Work-unit lifecycle**
+   - explicit state model (states + transitions + who mutates state; durable vs ephemeral)
+4. **Retention/replay interaction** (if retention or replay/backfill exists)
+   - retention key and the safety rule that prevents replay from referencing deleted data
+5. **Schema/version handling** (if schema/versioning exists)
+   - a single default rule for unknown versions (reject vs DLQ), and alternatives as optional decisions
+
+If the narrative does not specify these, pick **minimal conservative defaults**, record them in `docs/DECISIONS.md`, and ensure the validation checklist can catch them.
 
 ---
 
@@ -252,6 +303,17 @@ All documents must:
 • enforce a single source of truth  
 
 ---
+
+# TRACEABILITY REQUIREMENT (SPEC → ENFORCEMENT → TEST)
+
+For each SPEC-INV-* invariant you define, include (somewhere in the repo, typically `docs/invariants.md` and `docs/IMPLEMENTATION_PLAN.md`):
+
+- the enforcing component/subsystem
+- the enforcement point (where/how it is maintained)
+- at least one test/validation strategy
+- which implementation phase will add the test
+
+Avoid generic statements like “write tests.” Tests must map to invariants.
 
 # AI AGENT COMPATIBILITY
 

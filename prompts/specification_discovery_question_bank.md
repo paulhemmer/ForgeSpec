@@ -9,6 +9,16 @@ They are grouped by topic so the discovery process can move systematically.
 
 ---
 
+# 0. How to Use This Question Bank (Important)
+
+- If an answer is “bounded/limited/throttled,” follow up until you have:
+  - an explicit parameter (number/limit) or a precise rule
+  - overflow behavior
+  - a single owning component
+- If the system has a primary “thing that moves through it” (request/message/job/event/task), identify its **lifecycle** (states + transitions) early.
+
+---
+
 # 1. System Purpose
 
 - What problem does the system solve?
@@ -117,6 +127,25 @@ Examples:
 - Events must never disappear without record.
 
 ---
+
+# 10.5 State transitions / lifecycle (domain-agnostic)
+
+- What is the primary work unit (request/message/job/event/task/record) in this system?
+- What are its states (e.g. pending/in-progress/done/failed/cancelled/dlq)?
+- What triggers each transition?
+- Which component owns each transition?
+- Which state is durable vs ephemeral?
+- What does “done” mean (observable, durable criteria)?
+
+---
+
+# 10.6 Policy parameters (no “bounded” without a rule)
+
+- What are the queue/buffer bounds (capacity targets) and what happens when full?
+- What is the retry policy (max attempts, retryable vs permanent criteria, backoff)?
+- What is the retention policy (key, duration, cleanup behavior) and how does it interact with replay/backfill?
+- What is the rate limit/quota strategy (per-tenant/per-user/per-resource), and what happens when exceeded?
+- If schema/versioning exists: what is the default rule for unknown versions?
 
 # 11. Operational Constraints
 

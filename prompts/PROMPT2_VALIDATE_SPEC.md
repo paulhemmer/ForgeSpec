@@ -43,6 +43,25 @@ Perform the following analyses:
    - Report any such gaps in the design-review artifact (e.g. under Findings or Recommended Spec Clarifications).
    - If no narrative was provided, skip this analysis or note in the output that narrative coverage was not verified.
 
+7. Undefined policy parameters check (MUST-FLAG)
+   - If the spec uses words like bounded/limited/throttled/retry/backoff/retention without an explicit parameter or rule, treat it as a defect.
+   - Require: (a) a parameter or rule, (b) overflow behavior, and (c) a single owning component.
+
+8. State/lifecycle model check (MUST-EXIST)
+   - Verify the spec defines the lifecycle of the primary work unit(s):
+     - states
+     - transitions
+     - who mutates state
+     - what is durable vs ephemeral
+   - If missing, treat as a defect.
+
+9. Invariant traceability check (MUST-EXIST)
+   - For each SPEC-INV-* invariant, verify there is:
+     - an enforcement point (component + mechanism)
+     - at least one test/validation strategy
+     - a reference in the implementation plan (phase/gate)
+   - If missing, treat as a defect.
+
 For each issue found:
 
 • describe the failure scenario
@@ -58,3 +77,8 @@ The output document should contain:
 3. Findings
 4. Recommended Spec Clarifications
 5. Final Verdict
+
+In Findings, include a dedicated subsection:
+
+- Ambiguities that must be resolved into a single rule
+  - Example: “unknown schema versions are rejected or routed to DLQ” must be resolved into one default rule (alternatives may be optional).

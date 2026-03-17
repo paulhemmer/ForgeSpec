@@ -179,6 +179,29 @@ Explain the reasoning clearly.
 
 ---
 
+## Decision Preconditions (required)
+
+List:
+
+- what missing information would change your verdict
+- what measurements/constraints would resolve uncertainty
+- which invariants are most sensitive to the choice
+
+---
+
+## Scoring (required)
+
+Provide a simple weighted scoring table (you choose weights, but explain them briefly) for:
+
+- clarity
+- safety
+- boundedness/resource control
+- implementability/testability
+
+Use this to justify the final verdict.
+
+---
+
 # OPTIONAL
 
 If both architectures have weaknesses, propose a **hybrid architecture**
