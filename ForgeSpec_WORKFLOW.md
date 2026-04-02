@@ -8,11 +8,13 @@ structure used to execute the methodology.
 ForgeSpec is a **spec‑driven AI engineering workflow** where architecture and system
 constraints are defined before implementation is generated.
 
+The prompts in this workflow are intentionally written to enforce skeptical engineering discipline: respectful pushback, assumption testing, and failure-first reasoning. They are designed to reduce premature agreement and preserve independent judgment during discovery, specification, and review.
+
 The process can be summarized as:
 
 Idea → Specification Discovery → generate_spec prompt → Spec Repository → Spec Validation Loop → Implementation Plan → AI Implementation → Design Review → Iteration
 
-**Book reference:** Conceptual workflow in Chapter 7; discovery in Chapter 8; spec repository in Chapter 9; validation and design reviews in Chapter 10; implementation in Chapter 12. Operational quickstart: `QUICKSTART.md` and `examples/EXAMPLE_PROJECT.md`.
+**Book reference:** Conceptual workflow in Chapter 7; discovery in Chapter 8; spec repository in Chapter 9; validation and design reviews in Chapter 10; implementation in Chapter 12. Operational quickstart: `QUICKSTART.md` and `examples/EXAMPLE_PROJECT.md`. The book uses **reader-facing names** for prompts (**Specification Discovery**, **Generate Spec**, **Validate Spec**, **Reverse Spec**, **Architecture Compare**, **Reorient**); Chapter 7 lists how those map to the `prompts/` files below.
 
 **How to run the prompts:** Open your AI coding assistant (e.g. Cursor, Claude Code) in a project directory. For each step, paste the prompt file contents into a new chat and add your input in the PROJECT NARRATIVE (or equivalent) section. With file access, the assistant can create and edit the spec repository and run the validation loop.
 
@@ -70,7 +72,7 @@ spec/
     spec.md, engineering_rules.md, pipeline_work_units.md, pipeline_thread_model.md
 docs/
     AI_CONTEXT.md, SYSTEM_OVERVIEW.md, ARCHITECTURE.md, invariants.md,
-    IMPLEMENTATION_PLAN.md, DECISIONS.md, VALIDATION_CHECKLIST.md, GLOSSARY.md,
+    IMPLEMENTATION_PLAN.md, TRACEABILITY.md, DECISIONS.md, VALIDATION_CHECKLIST.md, GLOSSARY.md,
     design_reviews/
 prompts/
     kickoff_prompt.md
@@ -141,6 +143,19 @@ Phase 4 – Reliability & testing
 
 Use this plan (and the kickoff prompt) to drive the implementation phase in a controlled order.
 
+### Two-Round Realization (when complexity warrants)
+
+For complex systems, treat implementation as two explicit rounds:
+
+- **Round 1 — Architectural Realization (R1):** full wiring exists; lifecycle, queue/threading model, observability surfaces, and contracts are implemented. Scaffolded paths are allowed only behind stable interfaces.
+- **Round 2 — Production Realization (R2):** scaffolded paths are replaced with production implementations while preserving R1 contracts and invariants; behavioral, readiness, load, and shutdown guarantees are verified.
+
+Rules:
+
+- Any phase allowing scaffold/stub behavior on critical paths must be labeled `R1`.
+- A phase cannot be labeled `R2` if critical paths remain scaffolded.
+- `R1 complete` is not production-complete.
+
 ---
 
 # 5. AI Implementation
@@ -163,6 +178,8 @@ Provide the assistant with the kickoff prompt and the current phase of IMPLEMENT
 Typical loop:
 
 select subsystem → generate implementation → run tests → validate against spec
+
+**Re-anchor between slices:** When finishing a phase or task, starting a new session, or anytime context feels muddy, run **`prompts/PROMPT_REORIENT.md`** in a fresh context. It forces a read of `docs/IMPLEMENTATION_PLAN.md`, traceability, and the last trusted checkpoint, and produces a short report (phase, active task, open work, test posture, recommended next human action) **before** more implementation—without duplicating a full validation pass.
 
 ---
 
@@ -216,7 +233,22 @@ architecture → specification → implementation → validation → refinement
 Because the specification repository exists, future changes begin with **updating
 architecture**, not modifying code blindly.
 
-**Evolving an existing spec repository:** When adding features or changing requirements, do not re-run the generate_spec prompt (PROMPT1_GENERATE_SPEC)—that would regenerate the repo. Instead: (1) update architecture and specification documents to reflect the new capability, (2) run `prompts/PROMPT2_VALIDATE_SPEC.md` against the updated spec and save the review under `docs/design_reviews/`, (3) refine the spec from the review, (4) update implementation and tests to match the updated spec. See Chapter 7 — "Evolving the System: Adding Features" for the full sequence.
+**Evolving an existing spec repository:** When adding features or changing requirements, do not re-run the generate_spec prompt (PROMPT1_GENERATE_SPEC)—that would regenerate the repo. Instead: (1) update architecture and specification documents to reflect the new capability, (2) issue or update **ARCH-** / **SPEC-** / **TASK-** / **TEST-** IDs as needed and **keep `docs/TRACEABILITY.md` consistent** (same linkage rules as initial generation), (3) run `prompts/PROMPT2_VALIDATE_SPEC.md` against the updated spec and save the review under `docs/design_reviews/`, (4) refine the spec from the review, (5) update implementation and tests to match the updated spec. See Chapter 7 — "Evolving the System: Adding Features" for the full sequence.
+
+---
+
+## Traceability artifacts (ARCH → SPEC → TASK → TEST)
+
+The generate_spec prompt (`PROMPT1_GENERATE_SPEC.md`) requires stable identifiers and a rollup matrix:
+
+| Artifact | Role |
+|----------|------|
+| **`docs/TRACEABILITY.md`** | One row per **ARCH-**, **SPEC-**, **SPEC-INV-**, **TASK-**, and **TEST-** ID; **Upstream** / **Downstream** link obligations to work and verification. |
+| **`docs/IMPLEMENTATION_PLAN.md`** | **TASK-** and **TEST-** IDs embedded in phases, gates, and test line items; each task cites upstream spec/architecture IDs. |
+| **`docs/invariants.md`** | Per-invariant enforcement + **TEST-** mapping (echoes **SPEC-INV-***). |
+| **Test code** | Comments or metadata citing **TEST-** and **SPEC-INV-** / **SPEC-** IDs as implemented. |
+
+Validation (`PROMPT2_VALIDATE_SPEC.md`) includes a **traceability matrix audit**: orphan IDs, missing tests for invariants, and broken chains are defects. The **`prompts/kickoff_prompt.md`** produced with the repo instructs agents to maintain **`TRACEABILITY.md`** when closing tasks or adding tests.
 
 ---
 
@@ -245,7 +277,7 @@ ForgeSpec ensures those elements exist **before large amounts of code are produc
 | 2 | Insert output into generate_spec prompt; generate spec repo | `prompts/PROMPT1_GENERATE_SPEC.md` | Ch 7, 9 |
 | 3 | Run Spec Validation Loop; save reviews under `docs/design_reviews/` | `prompts/PROMPT2_VALIDATE_SPEC.md` | Ch 10 |
 | 4 | Use implementation plan from generate_spec output | `docs/IMPLEMENTATION_PLAN.md`, `prompts/kickoff_prompt.md` | Ch 12 |
-| 5 | Implement with AI agents (spec = source of truth) | — | Ch 12 |
+| 5 | Implement with AI agents (spec = source of truth); optional re-anchor with `prompts/PROMPT_REORIENT.md` between phases | `prompts/kickoff_prompt.md`, `prompts/PROMPT_REORIENT.md` | Ch 12 |
 | 6 | Run design reviews; iterate on spec and implementation | `prompts/PROMPT2_VALIDATE_SPEC.md` | Ch 10 |
 | 7 | (Optional) Compare two architectures | `prompts/PROMPT4_ARCHITECTURE_COMPARE.md` | Ch 7 |
 | 8 | (Optional) Reverse-engineer existing system | `prompts/PROMPT3_REVERSE_SPEC.md` | Ch 11 |
@@ -260,11 +292,11 @@ ForgeSpec’s prompts and artifacts cover the full lifecycle as follows:
 
 | Stage | Covered by | Note |
 |-------|------------|------|
-| Discovery | `PROMPT0_SPEC_DISCOVERY.md` | Q&A until you have a project narrative. |
-| Architecture + spec repo | `PROMPT1_GENERATE_SPEC.md` (generate_spec) | Produces `spec/`, `docs/`, and initial specs. |
+| Discovery | `PROMPT0_SPEC_DISCOVERY.md` | Q&A until you have a project narrative; include **technology and integrations** (languages, third-party libraries, external APIs/SaaS) when relevant—see question bank section 14. |
+| Architecture + spec repo | `PROMPT1_GENERATE_SPEC.md` (generate_spec) | Produces `spec/`, `docs/` (including `TRACEABILITY.md`), and initial specs. |
 | Spec validation | `PROMPT2_VALIDATE_SPEC.md` | Run repeatedly; save artifacts under `docs/design_reviews/`. |
 | Implementation planning | **No separate prompt.** | Use `docs/IMPLEMENTATION_PLAN.md` and `prompts/kickoff_prompt.md` produced by the generate_spec prompt. |
-| Implementation | **No prompt.** | Use the spec repository as source of truth; coding agents implement from `IMPLEMENTATION_PLAN.md` and spec docs. |
+| Implementation | **`prompts/kickoff_prompt.md`** (per phase); optional **`prompts/PROMPT_REORIENT.md`** between phases or when context is unclear | Coding agents implement from `IMPLEMENTATION_PLAN.md` and spec docs; reorientation re-reads the plan and traceability without generating code until the report is complete. |
 | Design review / iteration | `PROMPT2_VALIDATE_SPEC.md` | Same prompt; use to check for drift and refine spec. |
 | Reverse (optional) | `PROMPT3_REVERSE_SPEC.md` | For existing systems. |
 | Compare (optional) | `PROMPT4_ARCHITECTURE_COMPARE.md` | When choosing between two designs. |

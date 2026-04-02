@@ -1,4 +1,6 @@
 
+# ForgeSpec
+
 <img src="assets/cover_art.png" width="320">
 
 **ForgeSpec** is a specification‑driven architecture framework for building reliable software systems with AI coding agents.
@@ -34,6 +36,10 @@ The book explains:
 • how to safely guide AI coding agents during large implementations  
 
 This repository contains the **working prompts, templates, and example workflows** referenced in the book.
+
+Official resources:
+
+Website: https://forgespec.io  
 
 ---
 
@@ -107,6 +113,7 @@ docs/
     ARCHITECTURE.md
     invariants.md
     IMPLEMENTATION_PLAN.md
+    TRACEABILITY.md
     DECISIONS.md
     VALIDATION_CHECKLIST.md
     GLOSSARY.md
@@ -235,7 +242,7 @@ This capability is especially valuable for:
 
 The ForgeSpec **book** explains:
 
-• the architectural philosophy  
+• the architectural discipline  
 • specification design principles  
 • concurrency modeling  
 • pipeline verification  

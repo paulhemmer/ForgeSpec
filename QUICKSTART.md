@@ -9,7 +9,9 @@ ForgeSpec is built on a simple engineering principle:
 
 Architecture is designed first. The system is specified second. Implementation is then delegated to AI tools.
 
-**Canonical workflow:** See **`ForgeSpec_WORKFLOW.md`** for the full step-by-step operational reference (prompts, outputs, and book chapters). For a prompt–chapter index, see **`book/ForgeSpec_Book_Outline.md`** (Prompt–Chapter Map).
+ForgeSpec prompts are intentionally non-affirmational: they are built to apply respectful pushback, test assumptions, and surface failure modes early rather than converging on the first plausible answer.
+
+**Canonical workflow:** See **`ForgeSpec_WORKFLOW.md`** for the full step-by-step operational reference (prompts, outputs, and book chapters). For reader-facing prompt names (**Specification Discovery**, **Generate Spec**, **Validate Spec**, and so on), see **Chapter 7** of the book; for a prompt–chapter index, see **`book/ForgeSpec_Book_Outline.md`** (Prompt–Chapter Map).
 
 Workflow:
 
@@ -26,9 +28,9 @@ If you do not yet have a clear system description, start with a **Specification 
 You can either:
 
 - use the template in `book/chapters/Chapter8_Iterative_Specification_Discovery.md`, or  
-- run `prompts/PROMPT0_SPEC_DISCOVERY.md` with your informal description.
+- run **Specification Discovery** (`PROMPT0_SPEC_DISCOVERY.md` in `prompts/`) with your informal description.
 
-For best results, run discovery in an environment where the assistant can read the repository (so it can use the question bank in `prompts/specification_discovery_question_bank.md`), or paste the question bank into the chat along with the prompt.
+For best results, run discovery in an environment where the assistant can read the repository (so it can use the specification discovery question bank in `prompts/`), or paste the question bank into the chat along with the prompt.
 
 The goal is to produce a concise narrative that captures:
 
@@ -37,7 +39,7 @@ The goal is to produce a concise narrative that captures:
 • failure behavior  
 • responsibility ownership  
 
-**Where to use it:** Paste this narrative into the **PROJECT NARRATIVE** section at the bottom of `prompts/PROMPT1_GENERATE_SPEC.md` in the next step.
+**Where to use it:** Paste this narrative into the **PROJECT NARRATIVE** section at the bottom of **Generate Spec** (`PROMPT1_GENERATE_SPEC.md` in `prompts/`) in the next step.
 
 ---
 
@@ -62,7 +64,7 @@ deterministic shutdown behavior.
 
 # Step 3 — Generate the Specification
 
-Run the generate_spec prompt:
+Run **Generate Spec**:
 
 `prompts/PROMPT1_GENERATE_SPEC.md`
 
@@ -72,7 +74,7 @@ This produces a **specification repository** describing the system architecture.
 
 # Step 4 — Validate the Architecture
 
-Run the validation prompt:
+Run **Validate Spec**:
 
 `prompts/PROMPT2_VALIDATE_SPEC.md`
 
@@ -105,7 +107,9 @@ Once the specification is stable:
 commit the spec repository  
 implement the system using the spec as the authority
 
-Implement or generate tests and acceptance criteria from the implementation plan so that the implementation is verified against the spec.
+Implement or generate tests and acceptance criteria from the implementation plan so that the implementation is verified against the spec. Keep **`docs/TRACEABILITY.md`** updated as **TASK-** and **TEST-** rows move to done—see `ForgeSpec_WORKFLOW.md` (Traceability artifacts).
+
+Between phases—or if you lose track of what is done—run **Reorient** (`PROMPT_REORIENT.md` in `prompts/`) so the agent re-reads `docs/IMPLEMENTATION_PLAN.md` and produces a short status report before continuing (see `ForgeSpec_WORKFLOW.md`, AI Implementation).
 
 Rule:
 
@@ -118,14 +122,14 @@ Rule:
 ## Reverse-Engineering an Existing System
 
 If you already have a system or codebase and want to document its architecture,
-run the reverse-spec prompt:
+run **Reverse Spec**:
 
 `prompts/PROMPT3_REVERSE_SPEC.md`
 
 This prompt analyzes the system and generates a **formal specification
 repository describing the existing architecture**.
 
-You can then run:
+You can then run **Validate Spec**:
 
 `prompts/PROMPT2_VALIDATE_SPEC.md`
 
