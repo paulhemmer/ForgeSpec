@@ -37,10 +37,6 @@ The book explains:
 
 This repository contains the **working prompts, templates, and example workflows** referenced in the book.
 
-Official resources:
-
-Website: https://forgespec.io  
-
 ---
 
 # Start Here
