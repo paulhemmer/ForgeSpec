@@ -1,6 +1,6 @@
 # ForgeSpec — Quick Start
 
-ForgeSpec helps you design and validate **software architecture specifications**
+ForgeSpec helps you design and validate **software architecture specs**
 using LLMs.
 
 ForgeSpec is built on a simple engineering principle:
@@ -15,7 +15,7 @@ ForgeSpec prompts are intentionally non-affirmational: they are built to apply r
 
 Workflow:
 
-problem → architecture → specification → implementation
+problem → architecture → spec → implementation
 
 ForgeSpec combines spec-driven and test-driven development; tests enforce the spec (details in Chapter 12 and `ForgeSpec_WORKFLOW.md`). The workflow is best used with an **agentic coding assistant** that has project and file access (e.g. Cursor, Claude Code); see Chapter 12 for why. Editor integrations that expose the spec repo or validation status (e.g. via MCP or similar) can make the workflow smoother.
 
@@ -30,7 +30,7 @@ You can either:
 - use the template in `book/chapters/Chapter8_Iterative_Specification_Discovery.md`, or  
 - run **Specification Discovery** (`PROMPT0_SPEC_DISCOVERY.md` in `prompts/`) with your informal description.
 
-For best results, run discovery in an environment where the assistant can read the repository (so it can use the specification discovery question bank in `prompts/`), or paste the question bank into the chat along with the prompt.
+For best results, run discovery in an environment where the assistant can read the repository (so it can use the spec discovery question bank in `prompts/`), or paste the question bank into the chat along with the prompt.
 
 The goal is to produce a concise narrative that captures:
 
@@ -62,13 +62,13 @@ deterministic shutdown behavior.
 
 ---
 
-# Step 3 — Generate the Specification
+# Step 3 — Generate the Spec
 
 Run **Generate Spec**:
 
 `prompts/PROMPT1_GENERATE_SPEC.md`
 
-This produces a **specification repository** describing the system architecture.
+This produces a **spec repository** describing the system architecture.
 
 ---
 
@@ -94,7 +94,7 @@ Save the review artifact in:
 
 # Step 5 — Refine the Spec
 
-Update the specification based on review findings.
+Update the spec based on review findings.
 
 Repeat validation until the architecture stabilizes.
 
@@ -102,7 +102,7 @@ Repeat validation until the architecture stabilizes.
 
 # Step 6 — Begin Implementation
 
-Once the specification is stable:
+Once the spec is stable:
 
 commit the spec repository  
 implement the system using the spec as the authority
@@ -110,6 +110,8 @@ implement the system using the spec as the authority
 Implement or generate tests and acceptance criteria from the implementation plan so that the implementation is verified against the spec. Keep **`docs/TRACEABILITY.md`** updated as **TASK-** and **TEST-** rows move to done—see `ForgeSpec_WORKFLOW.md` (Traceability artifacts).
 
 Between phases—or if you lose track of what is done—run **Reorient** (`PROMPT_REORIENT.md` in `prompts/`) so the agent re-reads `docs/IMPLEMENTATION_PLAN.md` and produces a short status report before continuing (see `ForgeSpec_WORKFLOW.md`, AI Implementation).
+
+Optional: use the **Controlled Implementation Loop** for slice-by-slice discipline—see `docs/IMPLEMENTATION_EXECUTION.md` and prompts **Implementation Slice** / **Implementation Review** / **Commit Message** (`PROMPT5`–`PROMPT7` in `prompts/`). Optional Round 3 (Timing Realization): **Optimize** (`PROMPT8_OPTIMIZE.md`), see Chapter 12.
 
 Rule:
 
@@ -126,7 +128,7 @@ run **Reverse Spec**:
 
 `prompts/PROMPT3_REVERSE_SPEC.md`
 
-This prompt analyzes the system and generates a **formal specification
+This prompt analyzes the system and generates a **formal spec
 repository describing the existing architecture**.
 
 You can then run **Validate Spec**:

@@ -15,6 +15,7 @@ The architectures may be presented as:
 • system descriptions  
 
 Your job is to evaluate them objectively.
+Maintain a professional review tone and skeptical posture: do not reward agreeableness or narrative confidence; reward explicit constraints, testable assumptions, and failure resilience.
 
 ---
 
@@ -117,6 +118,30 @@ Determine whether the architecture minimizes unnecessary complexity.
 
 ---
 
+## 8. Traceability posture (if IDs/matrices are present)
+
+If either architecture includes **ARCH-** / **SPEC-** / **TASK-** / **TEST-** identifiers or a **`TRACEABILITY.md`** (or equivalent matrix):
+
+• assess whether obligations, work units, and verification hooks form a coherent **ARCH → SPEC → TASK → TEST** chain  
+• flag orphan tasks, orphan tests, or invariants with no verification path  
+• prefer the design that makes linkage explicit and maintainable
+
+If neither input includes traceability artifacts, note that and skip scoring this criterion.
+
+---
+
+## 9. Technology and external dependency clarity (when stated)
+
+If either architecture names **languages**, **libraries**, **external APIs**, **SaaS**, or **managed services**:
+
+• compare whether **required vs optional** dependencies are equally clear  
+• flag **hidden coupling** (e.g. one design pushes vendor logic into many subsystems)  
+• prefer the design that **localizes** integration ownership and records **failure assumptions** for external calls  
+
+If neither input states technology constraints, note that and skip scoring this criterion.
+
+---
+
 # COMPARISON PROCESS
 
 For each architecture:
@@ -127,6 +152,11 @@ For each architecture:
 4. Identify potential failure modes
 
 Then compare the two designs directly.
+
+Before final verdict, run a concise pre-mortem for each architecture:
+- what breaks first under realistic stress
+- which assumption is doing the most hidden work
+- which missing constraint would most likely cause drift
 
 ---
 
@@ -164,6 +194,7 @@ Evaluate which architecture performs better in:
 • performance potential  
 • maintainability  
 • implementation risk  
+• technology and external-integration clarity (when languages, libraries, or APIs are part of the comparison)
 
 ---
 

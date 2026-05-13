@@ -182,11 +182,108 @@ Use this section when the system is networked or distributed (multiple nodes, se
 
 # 14. Implementation context
 
-Optional. Use to capture preferences or constraints that will influence implementation; the spec itself remains implementation-agnostic unless the user wants language/stack noted.
+Optional but **strongly recommended** whenever the user cares *how* the system will be built or *what* it must integrate with. Use to capture preferences and **hard constraints** so generate_spec can record them in `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`, `spec/engineering_rules.md`, or `docs/AI_CONTEXT.md` (required vs recommended vs open).
 
-- Do you have a preferred programming language, runtime, or technology stack, or should the spec remain implementation-agnostic?
-- Are there constraints (e.g. existing systems, team skills, deployment environment) that should influence language or stack choices?
-- Would you like the discovery output to include brief, architecture-informed implementation options (e.g. common choices for this kind of system) for later use?
+If the user has not mentioned language, libraries, or external APIs yet, **ask explicitly** whether they want to lock any of these in now or leave them open.
+
+## Language, runtime, and stack
+
+- Do you have a preferred **programming language**, **runtime** (e.g. JVM, Node, .NET), or **deployment shape** (containers, serverless, bare metal), or should the spec remain implementation-agnostic?
+- Are there constraints (existing systems, team skills, org standards, regulated environments) that **rule out** certain stacks?
+
+## Third-party libraries and packages
+
+- Which **libraries, frameworks, or packages** are **required** (names and, if known, major version or version range)?
+- Which are **preferred but substitutable** vs **hard dependencies** (e.g. “must use org-approved X”)?
+- Are there **forbidden** dependencies (license, security policy, supply-chain rules)?
+- For each required library: **what architectural obligation does it carry** (ORM owns schema migrations, HTTP client owns timeouts, etc.)?
+
+## External APIs, SaaS, and partner systems
+
+- Which **external HTTP/gRPC APIs**, **cloud vendor APIs**, **webhooks**, or **SaaS products** must the system call or receive traffic from?
+- For each: **authentication model** (API key, OAuth, mutual TLS, IAM role), **rough rate/limit expectations**, and **failure behavior** if the dependency is down or slow?
+- Are any APIs **contractually versioned** or **subject to deprecation** that the architecture must plan for?
+
+## SDKs, drivers, and protocol stacks
+
+- Are specific **client SDKs**, **database drivers**, **message-broker clients**, or **observability agents** mandated?
+- Must the system support **multiple implementations** of the same boundary (e.g. swap broker vendor) or is one vendor fixed?
+
+## Data stores and managed services (when chosen)
+
+- If the user has already chosen **Postgres**, **Redis**, **Kafka**, **S3**, etc.: capture **which subsystem owns** that dependency and whether the spec must treat it as **replaceable** or **fixed**.
+
+## Summary for handoff
+
+- Ask the user for a short **bullet list** of “must use / must integrate / must not use” if anything in this section applies—discovery output should carry that list forward to **PROJECT NARRATIVE** and **Decision Capture** so **Generate Spec** does not drop it.
+
+---
+
+# 15. Assumption Testing and Pre-Mortem
+
+- Which assumption in the current design is most likely to be wrong?
+- If this architecture fails in production in the first 30 days, what is most likely to break first?
+- Which subsystem boundary is most likely to hide coupling that is not yet documented?
+- What behavior currently depends on an unwritten rule?
+- What is the most likely source of scope creep in this design?
+- If one ownership decision is wrong, which one would cause the widest system-level damage?
+- What are two credible alternative designs for the highest-risk boundary, and why are we not choosing them?
+- What evidence or constraint would falsify the current preferred design?
+- Where could local optimization create a global inconsistency?
+- Which edge case is most likely to pass basic tests but violate an invariant under real load?
+
+---
+
+# 16. Security and Trust (requirements and boundaries)
+
+Use this section when the system is **exposed to untrusted input**, **reachable over a network** (including APIs, web, mobile, or cloud control planes), **handles identities or permissions**, **stores or processes sensitive data**, or **serves multiple tenants or organizations**. Skip or shorten only when the narrative explicitly scopes the system to a fully trusted, non-networked, single-actor context.
+
+The goal is not to replace specialized security design or threat modeling; it is to **surface security-relevant requirements early** so architecture and specs can record them alongside correctness and failure behavior.
+
+## Trust and actors
+
+- Who or what is **trusted** versus **untrusted** at each boundary (end users, admins, partner systems, devices, internal services)?
+- What are the **principal types** (human user, service account, device, anonymous) and how are they represented?
+- Are there **separate privilege levels** (e.g. operator vs. end user) and what can each class do?
+
+## Authentication and session lifecycle
+
+- How are callers **authenticated** (if at all): passwords, API keys, OAuth/OIDC, mutual TLS, platform identity, other?
+- How are **sessions or tokens** issued, renewed, and revoked? What is the **session timeout** or equivalent policy?
+- What happens on **credential compromise** or forced logout (revocation model, if any)?
+
+## Authorization
+
+- What **authorization model** applies: role-based, attribute-based, resource policies, ownership checks, or a mix?
+- Where are **permission decisions** enforced (which components are authoritative)?
+- Are there **object-level** rules (e.g. “user A may only access resource R”) and how is **enumeration** prevented where it matters?
+
+## Network exposure and surface area
+
+- Which interfaces are **public internet**, **partner/VPN**, **internal VPC only**, or **localhost**?
+- What is the **attack surface**: REST/GraphQL, WebSockets, gRPC, mobile apps, CLI, webhooks, file uploads?
+- Are **rate limits, abuse controls, or bot mitigation** required for any path?
+
+## Data protection
+
+- What data is **personally identifiable**, **financial**, **health**, **credentials**, or otherwise **regulated** (even if only “might be later”)?
+- What are the rules for **data at rest** (encryption expectations, key custody) and **data in transit** (TLS version expectations, certificate pinning for mobile if relevant)?
+- Where may **secrets** live (vault, managed identity, env vars) and what **rotation** expectations exist?
+
+## Client and supply-chain context (when relevant)
+
+- For **web or mobile clients**: how are tokens or secrets **stored** on device/browser; what **same-origin** or **deep link** assumptions apply?
+- For **dependencies and CI/CD** (if in scope): are there expectations for **pinned versions**, **SBOM**, or **signed artifacts**?
+
+## Abuse, safety, and observability
+
+- What **abuse cases** matter (credential stuffing, replay, IDOR, injection into logs or downstream systems, denial of service)?
+- What **security-relevant events** must be **auditable** (authentication failures, permission denials, admin actions, data export)?
+- What **must not** appear in logs (raw secrets, full payment payloads)?
+
+## Explicit non-goals (when useful)
+
+- What security properties are **explicitly out of scope** for this system or phase (e.g. “no public API in v1”), so the team does not assume silent coverage?
 
 ---
 
@@ -194,7 +291,7 @@ Optional. Use to capture preferences or constraints that will influence implemen
 
 During Specification Discovery, the AI should:
 
-1. Ask questions from each category. If the system is networked or distributed, include the networking section. If the user wants to capture implementation context or get language/stack suggestions, include the implementation context section.
+1. Ask questions from each category. If the system is networked or distributed, include the networking section. If the system exposes APIs, handles identities, processes sensitive data, or spans trust boundaries, include the **security and trust** section (section 16). If the user wants to capture implementation context or get language/stack suggestions, include the **implementation context** section (section 14)—including **third-party libraries** and **external APIs/SaaS** when the narrative implies integrations or when the user may have unstated dependency preferences.
 2. Record answers.
 3. Extract system invariants.
 4. Propose subsystem boundaries.
@@ -204,7 +301,7 @@ Once the architecture stabilizes, the system can move into the ForgeSpec workflo
 
 Architecture  
 ↓  
-Specifications  
+Specs  
 ↓  
 Implementation
 
