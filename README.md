@@ -1,7 +1,7 @@
 
 # ForgeSpec
 
-<img src="assets/cover_art.png" width="320">
+<img src="assets/cover_art.jpg" width="320">
 
 **ForgeSpec** is a spec‑driven architecture framework for building reliable software systems with AI coding agents.
 
