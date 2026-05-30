@@ -405,6 +405,10 @@ body::before {
   letter-spacing: 0.02em;
 }
 
+.book-order {
+  margin: var(--space-md) 0 0;
+}
+
 /* About */
 
 .about {
@@ -453,6 +457,7 @@ body::before {
   color: var(--color-accent-dim);
 }
 
+.about-order a,
 .about-github a {
   font-size: 0.9375rem;
   color: var(--color-accent-dim);
@@ -461,6 +466,8 @@ body::before {
   transition: color 0.2s ease, border-color 0.2s ease;
 }
 
+.about-order a:hover,
+.about-order a:focus-visible,
 .about-github a:hover,
 .about-github a:focus-visible {
   color: var(--color-accent);
